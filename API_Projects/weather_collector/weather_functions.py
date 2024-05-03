@@ -8,18 +8,47 @@ from collections import Counter
 from psycopg2 import Error
 from uszipcode import SearchEngine
 
+# GLOBAL VARIABLES
+search = SearchEngine()
+report_list = []
+attempt = 0 
+
 # get today date:
 today = datetime.now().strftime('%Y-%m-%d')
 
 # identify wind speed in a string
 pattern = r'\d+'
 
-# list of report
-report_list = []
+# get user's lattitude and longitude then convert to link for noa api
+def getCityLink(zipcode, MAX_ATTEMPT):
+    global attempt
 
+    # get lat and long from user's zipcode and predict if zipcode is invalid
+    try: 
+        zipcode_info = search.by_zipcode(zipcode)
+        lat = zipcode_info.lat
+        lng = zipcode_info.lng
+        city = zipcode_info.major_city
+        state = zipcode_info.state
+        search.close()
+    except Exception as e:
+        print("Zipcode doesn't exists or not in forecast zone")
+        search.close()
+        return None, None, None, None
+    
+    # create link to user's weather location
+    weather = requests.get(f'https://api.weather.gov/points/{lat},{lng}')
+    for attempt in range(MAX_ATTEMPT):
+        if weather.status_code == 200: 
+            weatherLink = weather.json()
+            temp_url = weatherLink['properties']['forecast']
+            precipitation_url = weatherLink['properties']['forecastGridData']   
+            return temp_url, precipitation_url, city, state 
+    return None, None, None, None
 
+# get weather from weather Link
 def get_weather(searchStartWeather, POPSdata):
-    # get temperature
+        # get temperature
         max_temp = float('-inf')
         avg_temp = 0
         min_temp = float('inf')
