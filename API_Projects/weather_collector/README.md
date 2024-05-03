@@ -2,7 +2,7 @@
 
 ### First function
 
-This program auto-collects weather data from Noa with values ranging from temperature, dew point, humidity, wind speed, precipitation, snow amount, and even short forecast description. It then formats the data like max, avg, and min of the values. It also calculates the precipitation of a state from mm to inch.
+This program takes in a zipcode from the user's location and then grabs weather data from Noa with values ranging from temperature, dew point, humidity, wind speed, precipitation, snow amount, and even short forecast description. It then formats the data like max, avg, and min of the values. It also calculates the precipitation of a state from mm to inch.
 
 ```python
 file.write(today + " forecast: \n")
